@@ -1,0 +1,63 @@
+@startuml
+' Dark Factory Stack - PlantUML (component-style diagram)
+
+skinparam backgroundColor white
+skinparam shadowing false
+skinparam defaultTextAlignment left
+
+skinparam rectangle {
+  RoundCorner 12
+  BorderColor #333333
+}
+
+title Deep Dive: Software Dark Factory Stack (from ASCII diagram)
+
+' --- Main blocks ---
+rectangle "Humans (Upstream)\n- Specs: What + constraints\n- Scenarios: behavior holdout" as HUMANS
+
+rectangle "Techniques Layer\n- Gene transfusion\n- FS as memory\n- Shift work" as TECH
+
+rectangle "Agents (How engine)\n- implement\n- tool use\n- retries/branches" as AGENTS
+
+rectangle "DTU (Digital Twins)\n- safe, scalable integ" as DTU
+
+rectangle "Validation\n- scenarios\n- satisfaction" as VALID
+
+rectangle "Agents iterate" as ITER
+
+rectangle "Validated output" as OUT
+
+' --- Side systems (required in practice) ---
+rectangle "Observability / context store\n(CXDB-style)\n(trace decision paths)" as OBS
+
+rectangle "Guardrails / policy enforcement\n(Leash + Cedar + MCP controls)" as GUARD
+
+rectangle "Economics controls\n(token budgets, caching, routing)" as ECON
+
+' --- Layout hints ---
+HUMANS -down-> AGENTS : input\n(specs)
+HUMANS -down-> VALID : input\n(scenarios)
+
+TECH -right-> AGENTS : patterns\n& guidance
+
+AGENTS -down-> DTU
+DTU -down-> VALID : results
+
+VALID -down-> ITER : feedback
+VALID -down-> OUT : ship
+
+ITER -up-> AGENTS : fixes\n& retry
+
+' --- Side system relationships (dashed to show supporting role) ---
+OBS ..> AGENTS : traces\n(turn graph)
+OBS ..> VALID : eval logs
+GUARD ..> AGENTS : enforce\npolicy
+GUARD ..> DTU : restrict\naccess
+ECON ..> AGENTS : budgets\n& routing
+ECON ..> VALID : cost-aware\nevaluation
+
+' Optional: keep side systems visually separate
+OBS -[hidden]-> GUARD
+GUARD -[hidden]-> ECON
+
+@enduml
